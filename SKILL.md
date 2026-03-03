@@ -1,6 +1,6 @@
 ---
 name: wechat-article-handler
-description: 处理微信文章链接 - 抓取内容、提取关键信息、保存到Obsidian每日收藏
+description: 处理微信文章链接 - 抓取内容、提取关键信息、保存到指定位置
 metadata:
   openclaw:
     emoji: 📎
@@ -8,7 +8,24 @@ metadata:
 
 # WeChat Article Handler - 微信文章处理
 
-自动处理衣哥发来的微信文章链接，完成抓取→提取→保存的完整流程。
+自动处理微信文章链接，完成抓取→提取→保存的完整流程。
+
+## 配置（用户自定义）
+
+在使用前，请修改以下配置：
+
+```yaml
+# config.yaml 示例
+save_location: "~/Documents/Obsidian/创业日志"  # 文章保存目录
+filename_pattern: "YYYY-MM-DD-daily-collection.md"  # 文件名格式
+template_format: "overview-insight-action"  # 输出格式模板
+```
+
+或使用环境变量：
+```bash
+export WECHAT_SAVE_DIR="~/Documents/Obsidian/收藏"
+export WECHAT_FILENAME_FORMAT="%Y-%m-%d-readings.md"
+```
 
 ## 触发条件
 
@@ -29,8 +46,8 @@ metadata:
    - 启发/收获
    - 可执行的行动项
     ↓
-3. 按标准格式保存到 Obsidian
-   - 路径：创业日志/YYYY-MM-DD/C-每日收藏.md
+3. 按标准格式保存到指定位置
+   - 路径：用户配置的 save_location
    - 格式：概述 → 启发 → 行动 + 标签
     ↓
 4. 返回确认
@@ -75,11 +92,11 @@ https://mp.weixin.qq.com/s/_9ERlECVFOd4CsTDXvmIfw
 2. 解析返回的 accessibility tree
 3. 提取标题、作者、正文要点
 4. 生成概述/启发/行动
-5. 追加到当日 C-每日收藏.md
+5. 追加到用户配置的保存位置
 
 **输出确认**：
 ```
-搞定！✅ 已保存到 创业日志/2026-03-04/C-每日收藏.md
+搞定！✅ 已保存到 ~/Documents/Obsidian/收藏/2026-03-04-readings.md
 
 **文章标题**：别把 OpenClaw 当 ChatGPT 用了...
 **核心内容**：OpenClaw 多 Agent 配置教程...
@@ -91,12 +108,17 @@ https://mp.weixin.qq.com/s/_9ERlECVFOd4CsTDXvmIfw
 1. **agent-browser 依赖**：确保已安装 `agent-browser` CLI 工具
 2. **网络等待**：微信文章需等待 JavaScript 渲染，必须使用 `wait --load networkidle`
 3. **内容截断**：如果 snapshot 返回内容不完整，尝试增加等待时间或重新抓取
-4. **重复检测**：同一链接不要重复保存，检查当日收藏是否已存在
-5. **分类规则**：
-   - "我的输出" = 衣哥自己写的文章
-   - "每日收藏" = 外部阅读的文章（默认）
+4. **重复检测**：同一链接不要重复保存，检查当日文件是否已存在
+5. **配置优先顺序**：环境变量 > config.yaml > 默认值
+
+## 默认配置
+
+如果没有自定义配置，使用以下默认值：
+- **保存目录**：`~/Documents/wechat-articles`
+- **文件名格式**：`%Y-%m-%d-readings.md`
+- **模板格式**：概述 → 启发 → 行动
 
 ## 相关文件
 
-- 保存目标：`~/Desktop/yzy-docs/创业日志/YYYY-MM-DD/C-每日收藏.md`
-- 历史收藏：`~/Desktop/yzy-docs/文档汇总/每日收藏合集/`
+- Skill 位置：`~/.openclaw/workspace/skills/wechat-article-handler/`
+- 配置文件：`config.yaml`（可选）
